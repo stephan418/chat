@@ -5,7 +5,7 @@ CREATE TABLE users
     password_hash INTEGER NOT NULL,
     creation      INTEGER NOT NULL,
     last_login    INTEGER DEFAULT NULL,
-    last_write    INTEGER DEFAULT creation
+    last_write    INTEGER NOT NULL
 );
 
 CREATE TABLE messages
@@ -15,11 +15,11 @@ CREATE TABLE messages
     receiver           INTEGER NOT NULL,
     text_content       TEXT CHECK (additional_content NOT NULL OR
                                    text_content NOT NULL),
-    additional_content INTEGER          DEFAULT NULL,
+    additional_content INTEGER DEFAULT NULL,
     creation           INTEGER NOT NULL,
-    date_sent          INTEGER NOT NULL DEFAULT creation,
-    date_delivered     INTEGER          DEFAULT NULL,
-    last_write         INTEGER NOT NULL DEFAULT creation,
+    date_sent          INTEGER NOT NULL,
+    date_delivered     INTEGER,
+    last_write         INTEGER NOT NULL,
 
     FOREIGN KEY (sender) REFERENCES users (user_id),
     FOREIGN KEY (receiver) REFERENCES users (user_id),
