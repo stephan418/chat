@@ -2,6 +2,7 @@
 
 import sqlite3
 from database.objects.user import User
+from database.objects.default import DBObject
 
 
 # Decorator which handles creating and closing a cursor
@@ -26,9 +27,8 @@ class MDB:  # Main DataBase
 
     # Generic object stuff
     @handle_cursor  # Handles cursor stuff
-    def insert_all_values(self, obj, table, _cursor: sqlite3.Cursor, keys=None, values=None):
-        if keys is None:
-            keys = obj.__dict__.keys()
+    def insert_all_values(self, obj: DBObject, table, _cursor: sqlite3.Cursor, keys=None, values=None):
+        keys = keys or obj.__dict__.keys()
 
         if values is None:
             values = []
@@ -41,3 +41,20 @@ class MDB:  # Main DataBase
 
         _cursor.execute(f'INSERT INTO {table} ({", ".join(keys)}) '
                         f'VALUES ({", ".join(values)});')  # INSERT INTO table_name (all_keys) VALUES (all_values)
+
+    @handle_cursor
+    def read_all_values(self, obj: DBObject, table, identifier, _cursor: sqlite3.Cursor, keys=None):
+        keys = keys or obj.__dict__.keys()
+
+        _cursor.execute(f'SELECT {", ".join(keys)} FROM {table} WHERE id = {identifier}')
+
+        values = _cursor.fetchone()
+
+        if values is not None:
+            for key, value in zip(keys, values):
+                obj.set_item(key, value)
+
+            return True
+
+        else:
+            return False
