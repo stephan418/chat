@@ -10,10 +10,12 @@ def handle_cursor(func):
     def wrapper(self, *args, **kwargs):
         cur = self._conn.cursor()
 
-        func(self, *args, _cursor=cur, **kwargs)
+        result = func(self, *args, _cursor=cur, **kwargs)
 
         cur.close()
         self._conn.commit()
+
+        return result
 
     return wrapper
 
