@@ -1,9 +1,10 @@
 from security.hash import password
 from security.identification.id import create_unique_id
+from database.objects.default import DBObject
 import time
 
 
-class User:
+class User(DBObject):
     def __init__(self, name: str, password_hash: str, user_id: int, cts: int, llts: int, lwts: int):
         self.name = name
         self.password_hash = password_hash
