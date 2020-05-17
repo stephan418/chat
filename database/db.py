@@ -41,9 +41,3 @@ class MDB:  # Main DataBase
 
         _cursor.execute(f'INSERT INTO {table} ({", ".join(keys)}) '
                         f'VALUES ({", ".join(values)});')  # INSERT INTO table_name (all_keys) VALUES (all_values)
-
-
-a = User("babo", "babo", 1234, 123, 123, 123)
-
-b = MDB("a.db")
-b.insert_all_values(a, "babo")
