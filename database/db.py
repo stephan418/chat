@@ -2,7 +2,6 @@
 
 import sqlite3
 from functools import wraps
-from database.objects.user import User
 from database.objects.default import DBObject
 
 
@@ -44,11 +43,12 @@ class MDB:  # Main DataBase
                 else:
                     values.append(str(value))
 
+        # INSERT INTO table_name (all_keys) VALUES (all_values)
         _cursor.execute(f'INSERT INTO {table} ({", ".join(keys)}) '
-                        f'VALUES ({", ".join(values)});')  # INSERT INTO table_name (all_keys) VALUES (all_values)
+                        f'VALUES ({", ".join("?" for _ in values)});', (*values,))
 
     @handle_cursor
-    def read_all_values(self, obj: DBObject, table: str, identifier: str, keys=None, _cursor: sqlite3.Cursor = None):
+    def read_all_values(self, obj: DBObject, table: str, identifier: int, keys=None, _cursor: sqlite3.Cursor = None):
         keys = keys or obj.__dict__.keys()
 
         _cursor.execute(f'SELECT {", ".join(keys)} FROM {table} WHERE id = {identifier}')
@@ -65,10 +65,9 @@ class MDB:  # Main DataBase
             return False
 
     @handle_cursor
-    def get_single_item(self, table: str, identifier: int, column: str, _cursor: sqlite3.Cursor = None):
-        _cursor.execute(f'SELECT {column} FROM {table} WHERE id = {identifier}')
+    def get_single_item(self, table: str, identifier: str, column: str, _cursor: sqlite3.Cursor = None):
+        _cursor.execute(f'SELECT {column} FROM {table} WHERE id = ?', (identifier,))
         values = _cursor.fetchone()
-
         if len(values) < 1:
             return None
 
@@ -78,10 +77,10 @@ class MDB:  # Main DataBase
     def set_single_value(self, table: str, identfier: int, column: str, value, _cursor: sqlite3.Cursor = None):
         value = f"'{value}'" if isinstance(value, str) else str(value)
 
-        _cursor.execute(f'UPDATE {table} SET {column} = {value} WHERE id = {identfier}')
+        _cursor.execute(f'UPDATE {table} SET {column} = {value} WHERE id = ?', (identfier,))
 
+    def get_cursor(self):
+        return self._conn.cursor()
 
-a = MDB('a.db')
-b = User.empty()
-
-a.get_single_item('babo', 123, 'name')
+    def get_connection(self):
+        return self._conn
