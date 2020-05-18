@@ -19,6 +19,7 @@ CREATE TABLE messages
     creation           INTEGER NOT NULL,
     date_sent          INTEGER NOT NULL,
     date_delivered     INTEGER,
+    date_read          INTEGER,
     last_write         INTEGER NOT NULL,
 
     FOREIGN KEY (sender) REFERENCES users (user_id),
