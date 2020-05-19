@@ -46,7 +46,7 @@ CREATE TABLE blobs
     type     INTEGER CHECK (type BETWEEN 1 AND 2),
     fs_path  TEXT    NOT NULL,
     author   INTEGER NOT NULL,
-    hash     BLOB    NOT NULL,
+    hash     TEXT    NOT NULL,
     creation INTEGER NOT NULL,
 
     FOREIGN KEY (author) REFERENCES users (user_id)

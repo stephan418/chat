@@ -1,6 +1,7 @@
 from database.objects.default import DBObject
 from security.identification.id import create_unique_id
 from security.encode.number_encode import b64encode
+from security.hash.file import hash_file
 import os
 import shutil
 import time
@@ -38,6 +39,9 @@ class Blob(DBObject):
 
         if not os.path.exists(path):
             raise FileNotFoundError("The file which is trying to be added doesn't exist")
+
+        with open(path, "rb") as file:
+            file_hash = hash_file(file)
 
         path = self._generate_id()
 
