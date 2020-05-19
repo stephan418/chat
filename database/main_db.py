@@ -1,4 +1,3 @@
-import sqlite3
+from database.db import MDB
 
-conn = sqlite3.connect("../../storage.db")
-db = conn.cursor()
+db = MDB("../../storage.db")
