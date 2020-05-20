@@ -48,13 +48,7 @@ class MDB:  # Main DataBase
         keys = keys or obj.__dict__.keys()
 
         if values is None:
-            values = []
-
-            for value in obj.__dict__.values():
-                if isinstance(value, str):  # Add quotes if the element is a string
-                    values.append(f"'{value}'")
-                else:
-                    values.append(str(value))
+            values = obj.__dict__.values()
 
         # INSERT INTO table_name (all_keys) VALUES (all_values)
         _cursor.execute(f'INSERT INTO {table} ({", ".join(keys)}) '

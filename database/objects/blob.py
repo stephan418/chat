@@ -31,7 +31,8 @@ class Blob(DBObject):
     This class represents data stored in the blob storage of the database.
     The blob storage is file system storage kept track of by the database to store binary file or large text.
     """
-    def __init__(self, blob_id: int, blob_type: int, author: int, blob_hash: int = None, path: str = None):
+    def __init__(self, blob_id: int, blob_type: int, author: int, blob_hash: int = None, path: str = None,
+                 creation: int = None):
         if not 0 <= blob_type <= 5:
             raise ValueError(f"{blob_type} is not a valid type id (0-5)")
 
@@ -40,6 +41,7 @@ class Blob(DBObject):
         self.fs_path = path
         self.author = author
         self.hash = blob_hash
+        self.creation = creation or time.time() * 1000
 
     # Register a file in the blob storage
     def register_file(self, path):
@@ -70,7 +72,9 @@ class Blob(DBObject):
                     values = db.get_all_elements_eq("blobs", "id", item[0], columns="id, type, fs_path, author, hash")
 
         if values is not None:
+            values = values[0]
             self.__init__(values[0], values[1], values[3], values[4], values[2])
+            os.remove(path)
             return values[2]
 
         fs_path = self._generate_id()
@@ -79,6 +83,8 @@ class Blob(DBObject):
         self.hash = file_hash
 
         self._move_to_blob_storage(path, fs_path)
+
+        self._add_to_db()
 
         return fs_path
 
@@ -104,7 +110,7 @@ class Blob(DBObject):
 
         # Make sure the path isn't already used TODO: Shouldn't actually happen (Test on multiple threads or processes)
         while os.path.exists(path):
-            path = f'{os.environ["BLOB_STORAGE"]}/{gmtime.tm_year}-{gmtime.tm_mon}/{gmtime.tm_mday}/' \
+            path = f'/{gmtime.tm_year}-{gmtime.tm_mon}/{gmtime.tm_mday}/' \
                    f'{gmtime.tm_hour}/{b64encode(create_unique_id())}.blob'
 
         return path
