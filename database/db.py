@@ -7,6 +7,9 @@ from database.objects.default import DBObject
 
 # Decorator which handles creating and closing a cursor
 def handle_cursor(func):
+    """
+    Handles the creation, passing and destruction of a cursor
+    """
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         cur = self._conn.cursor()
@@ -22,16 +25,26 @@ def handle_cursor(func):
 
 
 class MDB:  # Main DataBase
+    """
+    Object Mapper for the main database
+    """
     def __init__(self, filename):
         # Establish database connection
         self._conn = sqlite3.connect(filename)
 
         self._objects = []
 
-    # TODO: Prevent SQL injections
     # Generic object stuff
     @handle_cursor  # Handles cursor stuff
     def insert_all_values(self, obj: DBObject, table, keys=None, values=None, _cursor: sqlite3.Cursor = None):
+        """
+        Insert all the values in the object into the specified table
+        :param obj: Object to be inserted
+        :param table: Table to be inserted into
+        :param keys: Keys to be added (If already computed before) Not to be passed without passing according values
+        :param values: Values (In the same order as the keys; also like keys)
+        :param _cursor: Cursor used to execute queries
+        """
         keys = keys or obj.__dict__.keys()
 
         if values is None:
@@ -49,6 +62,14 @@ class MDB:  # Main DataBase
 
     @handle_cursor
     def read_all_values(self, obj: DBObject, table: str, identifier: int, keys=None, _cursor: sqlite3.Cursor = None):
+        """
+        Read all the values from a specified table into an object
+        :param obj: Object to be read into
+        :param table: Table to be read
+        :param identifier: ID of the element to be read
+        :param keys: Keys to be read (If already computed)
+        :param _cursor: Cursor used to execute queries
+        """
         keys = keys or obj.__dict__.keys()
 
         _cursor.execute(f'SELECT {", ".join(keys)} FROM {table} WHERE id = {identifier}')
@@ -66,6 +87,13 @@ class MDB:  # Main DataBase
 
     @handle_cursor
     def get_single_item(self, table: str, identifier: str, column: str, _cursor: sqlite3.Cursor = None):
+        """
+        Get a single item from a table
+        :param table: Table to be read
+        :param identifier: ID of the item to be read
+        :param column: Column to be read
+        :param _cursor: Cursor used to execute queries
+        """
         _cursor.execute(f'SELECT {column} FROM {table} WHERE id = ?', (identifier,))
         values = _cursor.fetchone()
         if len(values) < 1:
@@ -75,12 +103,28 @@ class MDB:  # Main DataBase
 
     @handle_cursor
     def set_single_value(self, table: str, identfier: int, column: str, value, _cursor: sqlite3.Cursor = None):
+        """
+        Set a single value
+        :param table: Table to be set
+        :param identfier: ID of the item to be set
+        :param column: Column of the item to be set
+        :param value: Value to be set to
+        :param _cursor: Cursor used to execute queries
+        """
         value = f"'{value}'" if isinstance(value, str) else str(value)
 
         _cursor.execute(f'UPDATE {table} SET {column} = {value} WHERE id = ?', (identfier,))
 
     def get_cursor(self):
+        """
+        Get a Cursor for the connection of the instance
+        :return: Cursor
+        """
         return self._conn.cursor()
 
     def get_connection(self):
+        """
+        Get the connection used by the instance
+        :return: Connection
+        """
         return self._conn

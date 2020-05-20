@@ -1,3 +1,5 @@
+# Test cases fot the database setup
+
 import unittest
 import sqlite3
 import os

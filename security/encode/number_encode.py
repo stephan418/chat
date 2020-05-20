@@ -6,6 +6,11 @@ d = {}  # Dictionary to cache the value generated in the next function
 
 # Encode number to base64
 def b64encode(number: int):
+    """
+    Encode a number to base64
+    :param number: number
+    :return: encoded number
+    """
     b = ""
     global d
 

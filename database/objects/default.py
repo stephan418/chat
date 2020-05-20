@@ -1,4 +1,7 @@
 class DBObject:
+    """
+    Superclass of all Database objects
+    """
     def get_item(self, name: str):
         return self.__dict__.get(name)
 
