@@ -8,6 +8,11 @@ import os
 import shutil
 import time
 from database.main_db import db
+import filecmp
+
+
+def file_equals_blob(file, fs_path):
+    return filecmp.cmp(file, os.environ['BLOB_STORAGE'] + fs_path)
 
 
 # Blob class for storing general information.
@@ -44,7 +49,6 @@ class Blob(DBObject):
         :param path: Current path of the file
         :return: blob storage path of the file
         """
-        # Don't execute if the file path is already set
         if self.fs_path is not None:
             raise ValueError("File already registered and saved!")
 
@@ -52,12 +56,32 @@ class Blob(DBObject):
             raise FileNotFoundError("The file which is trying to be added doesn't exist")
 
         with open(path, "rb") as file:
-            # Hash the file using the SHA256 algorithm
             file_hash = hash_file(file)
 
-        path = self._generate_id()
+        identical = db.get_all_elements_eq("blobs", "hash", file_hash, "id, fs_path")
+        values = None
 
-    # Copies the specified file to the blob storage
+        # TODO: Add check for type, so that a file as img isn't treated the same as txt with the same content
+        if identical is not None:
+            for item in identical:
+                fs_path = item[1]
+
+                if file_equals_blob(path, fs_path):
+                    values = db.get_all_elements_eq("blobs", "id", item[0], columns="id, type, fs_path, author, hash")
+
+        if values is not None:
+            self.__init__(values[0], values[1], values[3], values[4], values[2])
+            return values[2]
+
+        fs_path = self._generate_id()
+
+        self.fs_path = fs_path
+        self.hash = file_hash
+
+        self._move_to_blob_storage(path, fs_path)
+
+        return fs_path
+
     @staticmethod
     def _move_to_blob_storage(src, fs_path):
         """
@@ -73,7 +97,6 @@ class Blob(DBObject):
         Generates path for storage in the blob storage (unique)
         :return: Generated path
         """
-        # Set the path to something which surely exists
         path = "."
 
         # Using GMT
@@ -85,3 +108,6 @@ class Blob(DBObject):
                    f'{gmtime.tm_hour}/{b64encode(create_unique_id())}.blob'
 
         return path
+
+    def _add_to_db(self):
+        db.insert_all_values(self, "blobs")

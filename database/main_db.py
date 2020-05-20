@@ -1,3 +1,4 @@
 from database.db import MDB
+import os
 
-db = MDB("../../storage.db")
+db = MDB("../a.db")

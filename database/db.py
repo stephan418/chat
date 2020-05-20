@@ -115,6 +115,39 @@ class MDB:  # Main DataBase
 
         _cursor.execute(f'UPDATE {table} SET {column} = {value} WHERE id = ?', (identfier,))
 
+    @handle_cursor
+    def entry_exists_eq(self, table: str, column: str, value, _cursor: sqlite3.Cursor = None):
+        """
+        Checks for elements satisfying the condition
+        Don't use with user input (Vulnerable to SQL injection)
+        :param table: Table to check
+        :param column: Column where value must be located
+        :param value: Value which the column must have
+        :param _cursor: Cursor to be used for execution
+        :return: ID of the first element or False
+        """
+        _cursor.execute(f"SELECT * FROM {table} WHERE {column} = ? LIMIT 1;", (value,))
+
+        v = _cursor.fetchone()
+
+        return v if v is not None else False
+
+    @handle_cursor
+    def get_all_elements_eq(self, table: str, column: str, value, columns: str = "*", _cursor: sqlite3.Cursor = None):
+        """
+        Get all the elements where the column specified in column is the value specified
+        :param table: Table
+        :param column: Column which should be equal
+        :param value: Value to be tested for
+        :param columns: The columns to be selected
+        :param _cursor: Cursor used to execute queries
+        :return: None or a list of elements
+        """
+        _cursor.execute(f"SELECT {columns} FROM {table} WHERE {column} = ?", (value,))
+        values = _cursor.fetchall()
+
+        return values if len(values) > 0 else None
+
     def get_cursor(self):
         """
         Get a Cursor for the connection of the instance
