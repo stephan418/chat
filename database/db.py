@@ -1,4 +1,5 @@
 # Wrapper for a SQLite database
+# TODO: Test on multiple threats (race conditions?) and reimplement (command queue?)
 
 import sqlite3
 from functools import wraps
