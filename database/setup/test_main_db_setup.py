@@ -3,18 +3,20 @@
 import unittest
 import sqlite3
 import os
+from builtins import classmethod
 
 
 class TestDatabaseSetup(unittest.TestCase):
     def test_1setup(self):
-        if "test.db" in os.listdir():
-            os.remove("test.db")
-
         conn = sqlite3.connect("test.db")
         self.db = conn.cursor()
 
         with open("scheme.sql") as sql_file:
             self.db.executescript(sql_file.read())
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        os.remove("test.db")
 
 
 class TestDatabaseFunctionality(unittest.TestCase):
@@ -35,7 +37,7 @@ class TestDatabaseFunctionality(unittest.TestCase):
         self.cursor = self.conn.cursor()
 
     def test_1_insert(self):
-        self.cursor.execute("INSERT INTO users (user_id, name, password_hash, creation, last_write) VALUES "
+        self.cursor.execute("INSERT INTO users (id, name, password_hash, creation, last_write) VALUES "
                             "(123, 'babo', 123, 123, 123)")
 
     def test_2_read(self):
@@ -46,16 +48,16 @@ class TestDatabaseFunctionality(unittest.TestCase):
 
     def test_3_invalid_input_data_type(self):
         with self.assertRaises(sqlite3.IntegrityError):
-            self.cursor.execute("INSERT INTO users (user_id, name, password_hash, creation, last_write) VALUES "
+            self.cursor.execute("INSERT INTO users (id, name, password_hash, creation, last_write) VALUES "
                                 "(123, 'babo', 'hallo', 123, 123)")
 
     def test_3_invalid_input_not_given(self):
         with self.assertRaises(sqlite3.IntegrityError):
-            self.cursor.execute("INSERT INTO users (user_id, name, password_hash, last_write) VALUES "
+            self.cursor.execute("INSERT INTO users (id, name, password_hash, last_write) VALUES "
                             "(123, 'babo', 123, 123)")
 
     def test_4_message_insert(self):
-        self.cursor.execute("INSERT INTO messages (message_id, sender, receiver, text_content, creation, date_sent, "
+        self.cursor.execute("INSERT INTO messages (id, sender, receiver, text_content, creation, date_sent, "
                             "date_delivered, last_write) VALUES (123, 123, 123, 'babo', 123, 123, 123, 123)")
 
     def test_5_messsage_read(self):
