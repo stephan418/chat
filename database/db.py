@@ -106,9 +106,8 @@ class MDB:  # Main DataBase
         :param value: Value to be set to
         :param _cursor: Cursor used to execute queries
         """
-        value = f"'{value}'" if isinstance(value, str) else str(value)
 
-        _cursor.execute(f'UPDATE {table} SET {column} = {value} WHERE id = ?', (identfier,))
+        _cursor.execute(f'UPDATE {table} SET {column} = ? WHERE id = ?', (value, identfier,))
 
     @handle_cursor
     def entry_exists_eq(self, table: str, column: str, value, _cursor: sqlite3.Cursor = None):
