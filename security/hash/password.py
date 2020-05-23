@@ -15,7 +15,7 @@ def hash_password(password: str, s: str):
     return h.hex() + s
 
 
-def generate_salt(s_len=5):
+def generate_salt(s_len=8):  # Default salt length = 8
     """
     Generates a salt values
     :param s_len: Length of the salt
