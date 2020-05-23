@@ -2,7 +2,7 @@ CREATE TABLE users
 (
     id       INTEGER PRIMARY KEY,
     name          TEXT    NOT NULL,
-    password_hash INTEGER NOT NULL,
+    password_hash TEXT NOT NULL,
     creation      INTEGER NOT NULL,
     last_login    INTEGER DEFAULT NULL,
     last_write    INTEGER NOT NULL

@@ -44,7 +44,7 @@ class TestDatabaseFunctionality(unittest.TestCase):
         self.cursor.execute("SELECT * FROM users")
         entry = self.cursor.fetchone()
 
-        self.assertEqual(entry, (123, 'babo', 123, 123, None, 123))
+        self.assertEqual(entry, (123, 'babo', '123', 123, None, 123))
 
     def test_3_invalid_input_data_type(self):
         with self.assertRaises(sqlite3.IntegrityError):
@@ -74,3 +74,5 @@ class TestDatabaseFunctionality(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         os.remove("test.db")
+
+unittest.main()
