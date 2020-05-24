@@ -3,9 +3,10 @@ from database.main_db import db
 from security.identification.id import create_unique_id
 from security.hash import password
 import time
+import copy
 
 
-def create_user(name: str, pwd: str) -> User:
+def create_user(name: str, pwd: str, _db=db) -> User:
     """
     Create a new user and insert into the Database
     :return: Newly created user
@@ -17,12 +18,12 @@ def create_user(name: str, pwd: str) -> User:
 
     user = User(name, password_hash, user_id, cts, -1, cts)
 
-    db.insert_all_values(user, "users")
+    _db.insert_all_values(user, "users")
 
     return user
 
 
-def change_user_password(user: User, new_pwd: str):
+def change_user_password(user: User, new_pwd: str, no_copy=False, _db=db):
     """
     Change the password of a given users
     """
@@ -30,9 +31,20 @@ def change_user_password(user: User, new_pwd: str):
     password_hash = password.hash_password(new_pwd, salt)
     user_id = user.id
 
-    db.set_single_value("users", user_id, "password_hash", password_hash)
+    _db.set_single_value("users", user_id, "password_hash", password_hash)
+
+    if not no_copy:
+        new_user = copy.deepcopy(user)
+        new_user.password_hash = password_hash
+
+        return new_user
 
 
-def change_user_name(user: User, new_name: str):
+def change_user_name(user: User, new_name: str, no_copy=False, _db=db):
     """ Change the username of a user """
-    db.set_single_value("users", user.id, "name", new_name)
+    _db.set_single_value("users", user.id, "name", new_name)
+
+    if not no_copy:
+        new_user = copy.deepcopy(user)
+        new_user.name = new_name
+        return new_user
