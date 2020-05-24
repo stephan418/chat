@@ -97,6 +97,16 @@ class MDB:  # Main DataBase
         return values[0]
 
     @handle_cursor
+    def remove_single_item(self, table: str, identifier: str, _cursor: sqlite3.Cursor = None):
+        """
+        Delete a single item from a table
+        :param table: The table where the item is located
+        :param identifier: The ID of the item
+        :param _cursor: Cursor used to execute queries
+        """
+        _cursor.execute(f"DELETE FROM {table} WHERE id = ?", identifier)
+
+    @handle_cursor
     def set_single_value(self, table: str, identfier: int, column: str, value, _cursor: sqlite3.Cursor = None):
         """
         Set a single value
@@ -124,7 +134,7 @@ class MDB:  # Main DataBase
 
         v = _cursor.fetchone()
 
-        return v if v is not None else False
+        return True if v is not None else False
 
     @handle_cursor
     def get_all_elements_eq(self, table: str, column: str, value, columns: str = "*", _cursor: sqlite3.Cursor = None):
