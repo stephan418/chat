@@ -120,6 +120,18 @@ class MDB:  # Main DataBase
         _cursor.execute(f'UPDATE {table} SET {column} = ? WHERE id = ?', (value, identfier,))
 
     @handle_cursor
+    def update_all_values(self, obj: DBObject, table: str, identifier: int, keys=None, values=None,
+        _cursor: sqlite3.Cursor = None):
+
+        keys = keys or obj.__dict__.keys()
+
+        if values is None:
+            values = obj.__dict__.values()
+
+        _cursor.execute(f'UPDATE {table} SET {", ".join([f"{c} = ?" for c in keys])} WHERE id = ? ;',
+                        (*values, identifier))
+
+    @handle_cursor
     def entry_exists_eq(self, table: str, column: str, value, _cursor: sqlite3.Cursor = None):
         """
         Checks for elements satisfying the condition
