@@ -28,6 +28,11 @@ class Message(DBObject):
         self.date_read = date_read
         self.last_write = last_write or creation
 
+    @staticmethod
+    def empty():
+        """ :return Empty Message """
+        return Message(None, None, None, None, None, "")
+
 
 class Content:
     """
