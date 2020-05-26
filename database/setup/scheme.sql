@@ -1,8 +1,8 @@
 CREATE TABLE users
 (
-    id       INTEGER PRIMARY KEY,
+    id            INTEGER PRIMARY KEY,
     name          TEXT    NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT    NOT NULL,
     creation      INTEGER NOT NULL,
     last_login    INTEGER DEFAULT NULL,
     last_write    INTEGER NOT NULL
@@ -10,7 +10,7 @@ CREATE TABLE users
 
 CREATE TABLE messages
 (
-    id         INTEGER PRIMARY KEY,
+    id                 INTEGER PRIMARY KEY,
     sender             INTEGER NOT NULL,
     receiver           INTEGER NOT NULL,
     text_content       TEXT CHECK (additional_content NOT NULL OR
@@ -29,7 +29,7 @@ CREATE TABLE messages
 
 CREATE TABLE message_history
 (
-    id        INTEGER PRIMARY KEY,
+    id              INTEGER PRIMARY KEY,
     for_message     INTEGER NOT NULL,
     from_text       TEXT    DEFAULT NULL CHECK (from_text NOT NULL OR
                                                 from_additional NOT NULL),
@@ -42,7 +42,7 @@ CREATE TABLE message_history
 
 CREATE TABLE blobs
 (
-    id  INTEGER PRIMARY KEY,
+    id       INTEGER PRIMARY KEY,
     type     INTEGER CHECK (type BETWEEN 1 AND 2),
     fs_path  TEXT    NOT NULL,
     author   INTEGER NOT NULL,
