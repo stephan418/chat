@@ -17,7 +17,7 @@ class MessageHistoryEntry(DBObject):
         self.for_message = for_message
         self.from_text = from_text
         self.from_additional = from_additional
-        self.creation = creation or time.time() * 1000
+        self.creation = creation or int(time.time() * 1000)
 
     @staticmethod
     def new(from_message: Message):
