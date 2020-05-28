@@ -43,6 +43,10 @@ class Blob(DBObject):
         self.hash = blob_hash
         self.creation = creation or time.time() * 1000
 
+    @staticmethod
+    def empty():
+        return Blob(None, None, None, None, None, -1)
+
     # Register a file in the blob storage
     def register_file(self, path, _db=db):
         """
