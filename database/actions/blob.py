@@ -32,3 +32,7 @@ def get_blob(blob_id: int, _db=db):
     _db.read_all_values(blob, "blobs", blob_id)
 
     return blob
+
+
+def get_blob_path(blob_id: int, _db=db):
+    return _db.get_single_item("blobs", blob_id, "fs_path")

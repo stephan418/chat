@@ -48,3 +48,11 @@ def change_user_name(user: User, new_name: str, no_copy=False, _db=db):
         new_user = copy.deepcopy(user)
         new_user.name = new_name
         return new_user
+
+
+def get_user(user_id: int, _db=db):
+    user = User.empty()
+
+    _db.read_all_values(user, "users", user_id)
+
+    return user

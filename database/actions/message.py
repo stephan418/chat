@@ -59,3 +59,11 @@ def edit_message(msg_id: int, new_msg: message.Message, _db=db):
     _db.insert_all_values(history, "message_history")
 
     _db.update_all_values(new_msg, "messages", msg_id)
+
+
+def get_message(msg_id: int, _db=db):
+    msg = message.Message.empty()
+
+    _db.read_all_values(msg, "messages", msg_id)
+
+    return msg
