@@ -44,11 +44,12 @@ class Blob(DBObject):
         self.creation = creation or time.time() * 1000
 
     # Register a file in the blob storage
-    def register_file(self, path):
+    def register_file(self, path, _db=db):
         """
         Register a file in the blob storage and in the class instance.
         The original file will be deleted
         :param path: Current path of the file
+        :param _db: MDB handle
         :return: blob storage path of the file
         """
         if self.fs_path is not None:
@@ -60,7 +61,7 @@ class Blob(DBObject):
         with open(path, "rb") as file:
             file_hash = hash_file(file)
 
-        identical = db.get_all_elements_eq("blobs", "hash", file_hash, "id, fs_path")
+        identical = _db.get_all_elements_eq("blobs", "hash", file_hash, "id, fs_path")
         values = None
 
         # TODO: Add check for type, so that a file as img isn't treated the same as txt with the same content
@@ -69,7 +70,7 @@ class Blob(DBObject):
                 fs_path = item[1]
 
                 if file_equals_blob(path, fs_path):
-                    values = db.get_all_elements_eq("blobs", "id", item[0], columns="id, type, fs_path, author, hash")
+                    values = _db.get_all_elements_eq("blobs", "id", item[0], columns="id, type, fs_path, author, hash")
 
         if values is not None:
             values = values[0]
@@ -84,7 +85,7 @@ class Blob(DBObject):
 
         self._move_to_blob_storage(path, fs_path)
 
-        self._add_to_db()
+        self._add_to_db(_db=_db)
 
         return fs_path
 
@@ -95,6 +96,11 @@ class Blob(DBObject):
         :param src: Current path of the file
         :param fs_path: Path in the blob storage (Blob._generate_id)
         """
+        dirs = "/".join((os.environ['BLOB_STORAGE'] + fs_path).split("/")[:-1])
+
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
+
         shutil.move(src, os.environ['BLOB_STORAGE'] + fs_path, copy_function=shutil.copy)
 
     @staticmethod
@@ -115,5 +121,5 @@ class Blob(DBObject):
 
         return path
 
-    def _add_to_db(self):
-        db.insert_all_values(self, "blobs")
+    def _add_to_db(self, _db=db):
+        _db.insert_all_values(self, "blobs")
