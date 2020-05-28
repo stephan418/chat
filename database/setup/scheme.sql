@@ -50,4 +50,16 @@ CREATE TABLE blobs
     creation INTEGER NOT NULL,
 
     FOREIGN KEY (author) REFERENCES users (id)
-)
+);
+
+CREATE TABLE session
+(
+    id           INTEGER PRIMARY KEY,
+    secret       TEXT    NOT NULL,
+    for_user     INTEGER NOT NULL,
+    creation     INTEGER NOT NULL,
+    expires      INTEGER NOT NULL,
+    time_renewed INTEGER NOT NULL,
+
+    FOREIGN KEY (for_user) REFERENCES users (id)
+);
