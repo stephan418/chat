@@ -43,7 +43,7 @@ CREATE TABLE message_history
 CREATE TABLE blobs
 (
     id       INTEGER PRIMARY KEY,
-    type     INTEGER CHECK (type BETWEEN 1 AND 2),
+    type     INTEGER CHECK (type BETWEEN 0 AND 5),
     fs_path  TEXT    NOT NULL,
     author   INTEGER NOT NULL,
     hash     TEXT    NOT NULL,
