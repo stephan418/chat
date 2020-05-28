@@ -81,7 +81,7 @@ class MDB:  # Main DataBase
             return False
 
     @handle_cursor
-    def get_single_item(self, table: str, identifier: str, column: str, _cursor: sqlite3.Cursor = None):
+    def get_single_item(self, table: str, identifier: int, column: str, _cursor: sqlite3.Cursor = None):
         """
         Get a single item from a table
         :param table: Table to be read
