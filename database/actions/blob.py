@@ -24,3 +24,11 @@ def add_to_storage(current_path: str, content_type: int, author: int, _db=db):
     fs_path = blob.register_file(current_path, _db=_db)
 
     return fs_path
+
+
+def get_blob(blob_id: int, _db=db):
+    blob = Blob.empty()
+
+    _db.read_all_values(blob, "blobs", blob_id)
+
+    return blob
