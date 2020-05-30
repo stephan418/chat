@@ -37,14 +37,14 @@ class TestDatabaseFunctionality(unittest.TestCase):
         self.cursor = self.conn.cursor()
 
     def test_1_insert(self):
-        self.cursor.execute("INSERT INTO users (id, name, password_hash, creation, last_write) VALUES "
-                            "(123, 'babo', 123, 123, 123)")
+        self.cursor.execute("INSERT INTO users (id, name, password_hash, email, creation, last_write) VALUES "
+                            "(123, 'babo', 123, 'babo', 123, 123)")
 
     def test_2_read(self):
         self.cursor.execute("SELECT * FROM users")
         entry = self.cursor.fetchone()
 
-        self.assertEqual(entry, (123, 'babo', '123', 123, None, 123))
+        self.assertEqual(entry, (123, 'babo', '123', None, 'babo', 123, None, 123))
 
     def test_3_invalid_input_data_type(self):
         with self.assertRaises(sqlite3.IntegrityError):

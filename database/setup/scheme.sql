@@ -3,6 +3,8 @@ CREATE TABLE users
     id            INTEGER PRIMARY KEY,
     name          TEXT    NOT NULL,
     password_hash TEXT    NOT NULL,
+    login_id      TEXT CHECK (login_id NOT NULL OR email NOT NULL),
+    email         TEXT DEFAULT NULL,
     creation      INTEGER NOT NULL,
     last_login    INTEGER DEFAULT NULL,
     last_write    INTEGER NOT NULL
@@ -13,8 +15,9 @@ CREATE TABLE messages
     id                 INTEGER PRIMARY KEY,
     sender             INTEGER NOT NULL,
     receiver           INTEGER NOT NULL,
-    text_content       TEXT CHECK (additional_content NOT NULL OR
-                                   text_content NOT NULL),
+    text_content       TEXT    DEFAULT NULL CHECK
+        (additional_content NOT NULL OR
+         text_content NOT NULL),
     additional_content INTEGER DEFAULT NULL,
     creation           INTEGER NOT NULL,
     date_sent          INTEGER NOT NULL,
