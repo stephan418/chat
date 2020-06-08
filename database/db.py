@@ -11,6 +11,7 @@ def handle_cursor(func):
     """
     Handles the creation, passing and destruction of a cursor
     """
+
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         cur = self._conn.cursor()
@@ -29,6 +30,7 @@ class MDB:  # Main DataBase
     """
     Object Mapper for the main database
     """
+
     def __init__(self, filename):
         # Establish database connection
         self._conn = sqlite3.connect(filename)
@@ -121,7 +123,7 @@ class MDB:  # Main DataBase
 
     @handle_cursor
     def update_all_values(self, obj: DBObject, table: str, identifier: int, keys=None, values=None,
-        _cursor: sqlite3.Cursor = None):
+                          _cursor: sqlite3.Cursor = None):
 
         keys = keys or obj.__dict__.keys()
 
@@ -163,6 +165,11 @@ class MDB:  # Main DataBase
         values = _cursor.fetchall()
 
         return values if len(values) > 0 else None
+
+    @handle_cursor
+    def get_all_elements_from_table(self, table: str, columns="*", _cursor: sqlite3.Cursor = None):
+        """ Get all selected column of a table """
+        return _cursor.execute(f"SELECT {columns} FROM {table}").fetchall()
 
     def get_cursor(self):
         """
