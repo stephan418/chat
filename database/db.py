@@ -167,9 +167,14 @@ class MDB:  # Main DataBase
         return values if len(values) > 0 else None
 
     @handle_cursor
-    def get_all_elements_from_table(self, table: str, columns="*", _cursor: sqlite3.Cursor = None):
+    def get_all_elements_from_table(self, table: str, first=None, last=None, columns="*",
+                                    _cursor: sqlite3.Cursor = None):
         """ Get all selected column of a table """
-        return _cursor.execute(f"SELECT {columns} FROM {table}").fetchall()
+
+        if first is None and last is None:
+            return _cursor.execute(f"SELECT {columns} FROM {table}").fetchall()
+        else:
+            return _cursor.execute(f"SELECT {columns} FROM {table} LIMIT {last - first + 1} OFFSET {first}").fetchall()
 
     def get_cursor(self):
         """
