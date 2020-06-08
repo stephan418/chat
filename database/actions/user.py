@@ -56,3 +56,22 @@ def get_user(user_id: int, _db=db):
     _db.read_all_values(user, "users", user_id)
 
     return user
+
+
+def get_all_users(range_from: int, range_to: int, order_by: str = None, desc: bool = False, _db=db):
+    user_dict = User.empty().__dict__
+    keys = user_dict.keys()
+    columns = ", ".join(keys)
+
+    fetched_users = _db.get_all_elements_from_table('users', range_from, range_to, order_by, desc, columns)
+
+    users = []
+
+    for user_data in fetched_users:
+        user = User.empty()
+        for k, v in zip(keys, user_data):
+            user.set_item(k, v)
+
+        users.append(user)
+
+    return users
