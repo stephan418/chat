@@ -172,10 +172,14 @@ class MDB:  # Main DataBase
         """ Get all selected column of a table """
 
         q_string = f"SELECT {columns} FROM {table}" + (f" ORDER by {order_by}" if order_by else "") + \
-                   (" desc" if desc else "") + (f" LIMIT {last - first + 1} OFFSET {first}"
-                                                if last and first else "") + ";"
+                   (" desc" if desc else "") + (f" LIMIT {last - first} OFFSET {first}"
+                                                if None not in [last, first] else "") + ";"
 
         return _cursor.execute(q_string).fetchall()
+
+    @handle_cursor
+    def get_number_of_items_in_table(self, table: str, _cursor: sqlite3.Cursor = None):
+        return _cursor.execute(f'SELECT COUNT(*) FROM {table};').fetchone()
 
     def get_cursor(self):
         """
