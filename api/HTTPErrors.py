@@ -1,6 +1,6 @@
 """ Classes representing application Errors the client has to handle """
 
-from flask import jsonify, Blueprint
+from flask import jsonify
 
 
 class APIError(Exception):
