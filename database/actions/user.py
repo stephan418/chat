@@ -4,6 +4,7 @@ from security.identification.id import create_unique_id
 from security.hash import password
 import time
 import copy
+import sqlite3
 
 
 def create_user(name: str, pwd: str, email: str = None, login_id: str = None, _db=db) -> User:
@@ -61,7 +62,11 @@ def change_user_name(user: User, new_name: str, no_copy=False, _db=db):
 def get_user(user_id: int, _db=db):
     user = User.empty()
 
-    _db.read_all_values(user, "users", user_id)
+    try:
+        _db.read_all_values(user, "users", user_id)
+    except sqlite3.OperationalError as e:
+        if 'unrecognized token' in str(e):
+            return None
 
     return user
 
