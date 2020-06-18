@@ -13,7 +13,7 @@ def create_user(name: str, pwd: str, email: str = None, login_id: str = None, _d
     """
     salt = password.generate_salt()
     password_hash = password.hash_password(pwd, salt)
-    user_id = create_unique_id()
+    user_id = create_unique_id(_db)
     cts = int(time.time() * 1000)
 
     if not login_id:

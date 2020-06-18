@@ -14,7 +14,7 @@ def create_message(sender: int, receiver: int, content: message.Content, date_se
     :param _db: The database cursor (Default is most-likely ok, just for testing
     :return: Newly created message
     """
-    message_id = create_unique_id()
+    message_id = create_unique_id(_db)
     creation = int(time.time() * 1000)
 
     if not _db.entry_exists_eq("users", "id", sender):
@@ -49,7 +49,7 @@ def edit_message(msg_id: int, new_msg: message.Message, _db=db):
 
     _db.read_all_values(old_msg, "messages", msg_id)
 
-    history_id = create_unique_id()
+    history_id = create_unique_id(_db)
 
     new_msg.last_write = int(time.time() * 1000)
 

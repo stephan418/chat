@@ -122,7 +122,7 @@ class Blob(DBObject):
         # Make sure the path isn't already used TODO: Shouldn't actually happen (Test on multiple threads or processes)
         while os.path.exists(path):
             path = f'/{gmtime.tm_year}-{gmtime.tm_mon}/{gmtime.tm_mday}/' \
-                   f'{gmtime.tm_hour}/{b64encode(create_unique_id())}.blob'
+                   f'{gmtime.tm_hour}/{b64encode(create_unique_id(_db))}.blob'
 
         return path
 

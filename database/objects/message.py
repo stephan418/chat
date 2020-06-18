@@ -77,7 +77,7 @@ def create_message(sender: int, receiver: int, content: Content, date_sent: int)
     :param date_sent: time.time() * 100 of the time the message was sent
     :return: New instance of Message with the specified values
     """
-    message_id = create_unique_id()
+    message_id = create_unique_id(_db)
     creation = int(time.time() * 1000)
 
     message = Message(message_id, sender, receiver, creation, date_sent, content.text,

@@ -23,7 +23,7 @@ class Session(DBObject):
 
 def create_session(for_user: int):
     """ Create a new session for a specified user """
-    session_id = create_unique_id()
+    session_id = create_unique_id(_db)
     secret = str(uuid.uuid4())
 
     return Session(session_id, secret, for_user)

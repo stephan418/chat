@@ -33,7 +33,7 @@ class User(DBObject):
 def create_user(name: str, pwd: str) -> User:
     salt = password.generate_salt()
     password_hash = password.hash_password(pwd, salt)
-    user_id = create_unique_id()
+    user_id = create_unique_id(_db)
     cts = int(time.time() * 1000)
 
     user = User(name, password_hash, user_id, cts, -1, cts)

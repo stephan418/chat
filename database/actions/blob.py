@@ -17,7 +17,7 @@ def add_to_storage(current_path: str, content_type: int, author: int, _db=db):
     if extension not in allowed_extensions:
         raise ValueError(f"The file extension '{extension}' is not allowed")
 
-    blob_id = create_unique_id()
+    blob_id = create_unique_id(_db)
 
     blob = Blob(blob_id, content_type, author)
 

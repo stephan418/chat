@@ -26,7 +26,7 @@ class MessageHistoryEntry(DBObject):
         :param from_message: The message derived from
         :return: MessageHistoryEntry object
         """
-        entry_id = create_unique_id()
+        entry_id = create_unique_id(_db)
         for_message = from_message.id
         from_text = from_message.text_content
         from_additional = from_message.additional_content

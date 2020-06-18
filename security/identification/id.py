@@ -1,32 +1,27 @@
-import time
-
-# Initialize some counter and variables
-msg_number = 0
-msg_time = time.time() * 1000
+from database.db import MDB
+import secrets
 
 
-# This function creates a (unless used too frequently) unique timestamp
-def create_unique_ts_number():
-    """
-    Creates a unique timestamp
-    :return: timestamp
-    """
-    global msg_number
-    global msg_time
-    t = time.time() * 1000
+def _exists_in_tables(tables, value: int, _db: MDB):
+    for table in tables:
+        if _db.entry_exists_eq(table, 'id', value):
+            return True
 
-    if t - msg_time > 10:
-        msg_time = t
-        msg_number = 0
-
-    msg_number += 1
-    return msg_number
+    return False
 
 
 # Create a unique id consisting of a timestamp, a number timestamp revision number and a random number
-def create_unique_id() -> int:
+def create_unique_id(_db) -> int:
     """
     Creates a unique ID to be used in databases
+    :param _db:
     :return: Integer ID
     """
-    return int(str(int(time.time() * 1000)) + str(create_unique_ts_number()))
+    tables = ['users', 'messages', 'message_history', 'blobs', 'session']
+
+    gen_id = secrets.randbelow(9223372036854775808)  # 2**63 (SQLite max int
+
+    while _exists_in_tables(tables, gen_id, _db):
+        gen_id = secrets.randbelow(9223372036854775808)
+
+    return gen_id

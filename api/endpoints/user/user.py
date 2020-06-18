@@ -5,8 +5,10 @@
 from api.paginate import paginate
 from flask import Blueprint, request, jsonify
 from api.HTTPErrors import APIError
-from database.actions.user import get_all_users, create_user
+from database.actions.user import get_all_users, create_user, get_user
 from database.db import MDB
+from security.encode import number_encode
+from api import common
 
 user_endpoint = Blueprint("User endpoint", __name__)
 
@@ -55,7 +57,7 @@ def get_user_root():
 
         result = list()
         for user in users:
-            result.append({k: user.get_item(k) for k in keys})
+            result.append({k: common.encode_if_id(k, user.get_item(k)) for k in keys})
 
     return jsonify(result)
 
@@ -79,4 +81,8 @@ def post_user_root():
     for key in disallowed:
         keys.remove(key)
 
-    return jsonify({k: user.get_item(k) for k in keys})
+    return jsonify({k: common.encode_if_id(k, user.get_item(k)) for k in keys})
+
+# @user_endpoint.route('/<str:user_id>', methods=['GET'])
+# def get_user_id(user_id):
+#     user = get_user(user_id)

@@ -27,3 +27,41 @@ def b64encode(number: int):
         number //= 64
 
     return b[::-1]
+
+
+d_ = {}
+
+
+def b64decode(number: str):
+    """
+    Decode a base64 encoded number to decimal
+    :param number: Base64 number as a string
+    :return: decoded number
+    """
+    n = 0
+    global d_
+    number = list(number)
+
+    if len(d_) < 64:
+        d_ = {}
+        for i, value in enumerate(('0123456789' + string.ascii_letters + "@+-")):
+            d_.update({value: i})
+
+    c = 0
+
+    while number:
+        n += d_[number.pop()] * 64**c
+        c += 1
+
+    return n
+
+
+def b64encode_pad(number: int, pad_to: int):
+    """
+    Encode a number to base64 and pad it to match a specific length
+    :param number: Number to encode
+    :param pad_to: Minimum size of the number (in characters)
+    :return: Encoded and padded number
+    """
+    number = b64encode(number)
+    return ''.join(['0' for _ in range(pad_to - len(number))]) + number
