@@ -7,8 +7,8 @@ from flask import Blueprint, request, jsonify
 from api.HTTPErrors import APIError
 from database.actions.user import get_all_users, create_user, get_user
 from database.db import MDB
-from security.encode import number_encode
 from api import common
+from security.encode import number_encode
 
 user_endpoint = Blueprint("User endpoint", __name__)
 
@@ -83,6 +83,20 @@ def post_user_root():
 
     return jsonify({k: common.encode_if_id(k, user.get_item(k)) for k in keys})
 
-# @user_endpoint.route('/<str:user_id>', methods=['GET'])
-# def get_user_id(user_id):
-#     user = get_user(user_id)
+
+@user_endpoint.route('/<string:user_id>', methods=['GET'])
+def get_user_id(user_id):
+    db = MDB('test.db')
+
+    user = get_user(number_encode.b64decode(user_id), db)
+
+    if user is None:
+        raise APIError('The requested resource could not be found', 'NOT_FOUND', 404)
+
+    keys = list(user.__dict__.keys())
+
+    disallowed = ['password_hash', 'last_write', 'email']
+    for key in disallowed:
+        keys.remove(key)
+
+    return jsonify({k: common.encode_if_id(k, user.get_item(k)) for k in keys})
