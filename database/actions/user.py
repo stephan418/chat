@@ -6,7 +6,7 @@ import time
 import copy
 
 
-def create_user(name: str, pwd: str, _db=db) -> User:
+def create_user(name: str, pwd: str, email: str = None, login_id: str = None, _db=db) -> User:
     """
     Create a new user and insert into the Database
     :return: Newly created user
@@ -16,7 +16,15 @@ def create_user(name: str, pwd: str, _db=db) -> User:
     user_id = create_unique_id()
     cts = int(time.time() * 1000)
 
-    user = User(name, password_hash, user_id, cts, -1, cts)
+    if not login_id:
+        if email:
+            login_id = email
+        elif not _db.entry_exists_eq('users', 'login_id', name):
+            login_id = name
+        else:
+            login_id = "Hallo"  # randomize
+
+    user = User(name, password_hash, user_id, cts, -1, cts, login_id)
 
     _db.insert_all_values(user, "users")
 
