@@ -62,11 +62,13 @@ def change_user_name(user: User, new_name: str, no_copy=False, _db=db):
 def get_user(user_id: int, _db=db):
     user = User.empty()
 
-    try:
-        _db.read_all_values(user, "users", user_id)
-    except sqlite3.OperationalError as e:
-        if 'unrecognized token' in str(e):
-            return None
+    # try:
+    if not _db.read_all_values(user, "users", user_id):
+        return None
+
+    # except sqlite3.OperationalError as e:
+    #     if 'unrecognized token' in str(e):
+    #         return None
 
     return user
 
