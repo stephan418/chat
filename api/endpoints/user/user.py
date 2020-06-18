@@ -5,7 +5,7 @@
 from api.paginate import paginate
 from flask import Blueprint, request, jsonify
 from api.HTTPErrors import APIError
-from database.actions.user import get_all_users
+from database.actions.user import get_all_users, create_user
 from database.db import MDB
 
 user_endpoint = Blueprint("User endpoint", __name__)
@@ -17,6 +17,8 @@ user_endpoint = Blueprint("User endpoint", __name__)
 def get_user_root():
     # Create db connection (Thread) TODO: Investigate
     db = MDB('test.db')
+
+    print(request.content_type)
 
     per_page, page, order_by, desc = paginate(request.args, per_page=10, page=0, order_by='name', descending="False")
     if per_page > 50:
@@ -55,6 +57,26 @@ def get_user_root():
         for user in users:
             result.append({k: user.get_item(k) for k in keys})
 
-    response = jsonify(result)
+    return jsonify(result)
 
-    return response
+
+@user_endpoint.route('/', methods=['POST'])
+def post_user_root():
+    db = MDB('test.db')
+
+    json_data = request.get_json()
+
+    required = ['name', 'password']
+    for r in required:
+        if r not in json_data:
+            raise APIError("'name' and 'password' fields must be set", 'NOT_ENOUGH_INFORMATION', 400)
+
+    user = create_user(json_data['name'], json_data['password'], json_data.get('email'), json_data.get('login_id'),
+                       _db=db)
+    keys = list(user.__dict__.keys())
+
+    disallowed = ['password_hash', 'last_write', 'email']
+    for key in disallowed:
+        keys.remove(key)
+
+    return jsonify({k: user.get_item(k) for k in keys})
