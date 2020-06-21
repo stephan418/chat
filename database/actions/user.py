@@ -90,3 +90,17 @@ def get_all_users(range_from: int, range_to: int, order_by: str = None, desc: bo
         users.append(user)
 
     return users
+
+
+def check_user_password(user_id: int, pwd: str, _db=db):
+    """ Check if a password matches the one stored in the database """
+    user = get_user(user_id, _db)
+
+    password_hash = user.password_hash
+    salt = password_hash[-8:]
+    pwd = password.hash_password(pwd, salt)
+
+    if password_hash == pwd:
+        return True
+
+    return False
