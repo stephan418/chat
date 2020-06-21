@@ -13,19 +13,10 @@ class Session(DBObject):
         self.secret = secret
         self.for_user = for_user
         self.creation = creation or int(time.time() * 1000)
-        self.expires = expires or self.creation * 7 * 24 * 60 * 60 * 1000
+        self.expires = expires or self.creation + 7 * 24 * 60 * 60 * 1000
         self.times_renewed = times_renewed or 0
 
     @staticmethod
     def empty():
         return Session(None, None, None)
-
-
-def create_session(for_user: int):
-    """ Create a new session for a specified user """
-    session_id = create_unique_id(_db)
-    secret = str(uuid.uuid4())
-
-    return Session(session_id, secret, for_user)
-
 
