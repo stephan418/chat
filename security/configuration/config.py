@@ -33,4 +33,4 @@ class Config:
     def apply_to_app(self, app: Flask):
         """ Applies all config keys matching flask.* to the Flask app """
         for item in filter(lambda x: x[0].startswith('flask.'), self._config.items()):
-            app.config[item[0]] = item[1]
+            app.config[item[0].split('flask.')[1].upper()] = item[1]
