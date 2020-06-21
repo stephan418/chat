@@ -66,7 +66,7 @@ def get_user_root():
 def post_user_root():
     db = MDB('test.db')
 
-    json_data = request.get_json()
+    json_data = request.get_json(force=True)
 
     required = ['name', 'password']
     for r in required:
