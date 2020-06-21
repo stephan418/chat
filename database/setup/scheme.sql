@@ -55,14 +55,14 @@ CREATE TABLE blobs
     FOREIGN KEY (author) REFERENCES users (id)
 );
 
-CREATE TABLE session
+CREATE TABLE sessions
 (
     id           INTEGER PRIMARY KEY,
     secret       TEXT    NOT NULL,
     for_user     INTEGER NOT NULL,
     creation     INTEGER NOT NULL,
     expires      INTEGER NOT NULL,
-    time_renewed INTEGER NOT NULL,
+    times_renewed INTEGER NOT NULL,
 
     FOREIGN KEY (for_user) REFERENCES users (id)
 );
