@@ -69,7 +69,7 @@ class MDB:  # Main DataBase
         """
         keys = keys or obj.__dict__.keys()
 
-        _cursor.execute(f'SELECT {", ".join(keys)} FROM {table} WHERE id = {identifier}')
+        _cursor.execute(f'SELECT {", ".join(keys)} FROM {table} WHERE id = ?', (identifier,))
 
         values = _cursor.fetchone()
 
