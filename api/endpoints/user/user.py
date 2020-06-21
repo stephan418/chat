@@ -51,7 +51,7 @@ def get_user_root():
     else:
         keys = list(users[0].__dict__.keys())
 
-        disallowed = ['password_hash', 'last_write', 'email']
+        disallowed = ['password_hash', 'last_write', 'email', 'login_id']
         for key in disallowed:
             keys.remove(key)
 
@@ -95,7 +95,7 @@ def get_user_id(user_id):
 
     keys = list(user.__dict__.keys())
 
-    disallowed = ['password_hash', 'last_write', 'email']
+    disallowed = ['password_hash', 'last_write', 'email', 'login_id']
     for key in disallowed:
         keys.remove(key)
 
