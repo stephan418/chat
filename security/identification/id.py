@@ -17,7 +17,7 @@ def create_unique_id(_db) -> int:
     :param _db:
     :return: Integer ID
     """
-    tables = ['users', 'messages', 'message_history', 'blobs', 'session']
+    tables = ['users', 'messages', 'message_history', 'blobs', 'sessions']
 
     gen_id = secrets.randbelow(9223372036854775808)  # 2**63 (SQLite max int
 
