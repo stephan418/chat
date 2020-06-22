@@ -5,6 +5,7 @@ from database.actions.session import create_session, get_session
 from database.actions.user import check_user_password, get_user
 from security.encode.number_encode import b64decode
 from api import common
+from database.actions import session
 
 import time
 import secrets
@@ -60,7 +61,11 @@ def delete_session_id(session_id):
     db = MDB('test.db')
 
     session_id = b64decode(session_id)
-    s = get_session(session_id, db)
+
+    try:
+        s = get_session(session_id, db)
+    except session.ExpirationError:
+        raise APIError('This session has already expired!', 'RESOURCE_EXPIRED', 410)
 
     if not s:
         raise APIError('The requested resource could not be found', 'NOT_FOUND', 404)
