@@ -95,7 +95,7 @@ def get_user_id(user_id):
 
     keys = list(user.__dict__.keys())
 
-    disallowed = ['password_hash', 'last_write', 'email', 'login_id']
+    disallowed = ['password_hash', 'last_write', 'email']
     for key in disallowed:
         keys.remove(key)
 
