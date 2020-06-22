@@ -16,7 +16,7 @@ def b64encode(number: int):
 
     if len(d) < 64:
         d = {}
-        for i, value in enumerate(('0123456789' + string.ascii_letters + "@+-")):
+        for i, value in enumerate(('0123456789' + string.ascii_letters + "-_")):
             d.update({i: value})
 
     if number == 0:
@@ -44,13 +44,17 @@ def b64decode(number: str):
 
     if len(d_) < 64:
         d_ = {}
-        for i, value in enumerate(('0123456789' + string.ascii_letters + "@+-")):
+        for i, value in enumerate(('0123456789' + string.ascii_letters + "-_")):
             d_.update({value: i})
 
     c = 0
 
     while number:
-        n += d_[number.pop()] * 64**c
+        try:
+            n += d_[number.pop()] * 64**c
+        except KeyError:
+            return None
+
         c += 1
 
     return n
