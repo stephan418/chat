@@ -4,7 +4,7 @@ from security.encode import number_encode
 def encode_if_id(key: str, value, encode: list = None):
     """ Encode and pad the value if it is under the key 'id' """
     if encode is None:
-        encode = ['key']
+        encode = ['id']
 
     print(value, key)
 
