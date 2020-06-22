@@ -106,7 +106,7 @@ class MDB:  # Main DataBase
         :param identifier: The ID of the item
         :param _cursor: Cursor used to execute queries
         """
-        _cursor.execute(f"DELETE FROM {table} WHERE id = ?", identifier)
+        _cursor.execute(f"DELETE FROM {table} WHERE id = ?", (identifier,))
 
     @handle_cursor
     def set_single_value(self, table: str, identfier: int, column: str, value, _cursor: sqlite3.Cursor = None):
