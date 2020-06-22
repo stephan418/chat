@@ -59,6 +59,7 @@ CREATE TABLE sessions
 (
     id           INTEGER PRIMARY KEY,
     secret       TEXT    NOT NULL,
+    request_ip   TEXT    NOT NULL,
     for_user     INTEGER NOT NULL,
     creation     INTEGER NOT NULL,
     expires      INTEGER NOT NULL,
