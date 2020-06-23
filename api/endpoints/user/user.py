@@ -42,7 +42,7 @@ def get_user_root():
     users = get_all_users(per_page * page, (page + 1) * per_page, order_by, desc, _db=db)
 
     if len(users) <= 0:
-        raise APIError('page out of range', 'PAGE_OUT_OF_RANGE', payload={
+        raise APIError('page out of range', 'PAGE_OUT_OF_RANGE', 404, payload={
             "items": db.get_number_of_items_in_table('users')
         })
 
