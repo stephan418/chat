@@ -1,8 +1,10 @@
 from database.objects.session import Session
 from security.identification.id import create_unique_id
 from database.db import MDB
+from security.encode.number_encode import b64decode
 import uuid
 import time
+import base64
 
 
 class ExpirationError(Exception):
@@ -33,3 +35,31 @@ def get_session(sid: int, _db: MDB):
 
     return s
 
+
+def get_by_bearer(token: str, _db: MDB):
+    """ Get a session from a base64 encoded bearer token """
+    t = base64.b64decode(token).decode()
+    t = t.split('.')
+
+    if len(t) < 2:
+        raise ValueError('Not able to interpret token, missing session_secret')
+
+    print(t)
+
+    sid, secret = t
+
+    sid = b64decode(sid)
+
+    if sid is None:
+        raise ValueError('Invalid session_id')
+
+    # Pass potential ExpirationError to caller
+    s = get_session(sid, _db)
+
+    if s is None:
+        raise ValueError('Invalid session_id')
+
+    if s.secret != secret:
+        raise ValueError('Session secret invalid')
+
+    return s

@@ -88,7 +88,11 @@ def post_user_root():
 def get_user_id(user_id):
     db = MDB('test.db')
 
-    user = get_user(number_encode.b64decode(user_id), db)
+    uid = number_encode.b64decode(user_id)
+    if uid is None:
+        raise APIError('Unable to interpret an ID', 'INVALID_ID_FORMAT', 400)
+
+    user = get_user(uid, db)
 
     if user is None:
         raise APIError('The requested resource could not be found', 'NOT_FOUND', 404)

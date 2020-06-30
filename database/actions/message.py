@@ -39,6 +39,7 @@ def delete_message(msg_id: int, _db=db):
 
 
 def edit_message(msg_id: int, new_msg: message.Message, _db=db):
+    """ Edit a single message and open a history entry """
     if not _db.entry_exists_eq("messages", "id", msg_id):
         raise ValueError(f"The message with the ID '{msg_id}' does not exist")
 
@@ -62,8 +63,27 @@ def edit_message(msg_id: int, new_msg: message.Message, _db=db):
 
 
 def get_message(msg_id: int, _db=db):
+    """ Get a single message """
     msg = message.Message.empty()
 
-    _db.read_all_values(msg, "messages", msg_id)
+    if not _db.read_all_values(msg, "messages", msg_id):
+        return None
 
     return msg
+
+
+def get_user_messages(user_id: int, range_from: int, range_to: int, order_by: str = 'date_sent', desc: bool = False,
+                      _db=db):
+    """ Get all the messages sent or received by a specific user """
+    messages_db = _db.get_cursor()\
+        .execute('SELECT id, sender, receiver, creation, date_sent, text_content, additional_content, '
+                 'date_delivered, date_read, last_write FROM messages WHERE receiver = ? OR sender = ? '
+                 f'ORDER BY {order_by} ' + ('desc ' if desc else '') + f'LIMIT {range_to - range_from} OFFSET {range_from}',
+                 (user_id, user_id))
+
+    messages = []
+    for msg in messages_db:
+        new_msg = message.Message(*msg)
+        messages.append(new_msg)
+
+    return messages
