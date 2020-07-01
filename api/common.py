@@ -1,7 +1,7 @@
 from security.encode import number_encode
 from api.HTTPErrors import APIError
 from flask import Request
-from database.actions.session import get_by_bearer
+from database.actions.session import get_by_bearer, ExpirationError
 
 
 def encode_if_id(key: str, value, encode: list = None):
@@ -36,6 +36,8 @@ def handle_bearer_token(request: Request, db):
     try:
         s = get_by_bearer(b_token.split('Bearer ')[1], db)
     except ValueError:
+        _raise_token_error()
+    except ExpirationError:
         _raise_token_error()
 
     return s
