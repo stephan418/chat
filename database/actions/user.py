@@ -73,6 +73,22 @@ def get_user(user_id: int, _db=db):
     return user
 
 
+def get_by_login_id(login_id: str, _db=db):
+    user = _db.get_all_elements_eq('users', 'login_id', login_id, 'id')
+
+    if not user:
+        return None
+
+    if len(user) < 1:
+        return None
+
+    if len(user) > 1:
+        print('Value crash detected. ')
+        return None
+
+    return user[0][0]
+
+
 def get_all_users(range_from: int, range_to: int, order_by: str = None, desc: bool = False, _db=db):
     user_dict = User.empty().__dict__
     keys = user_dict.keys()

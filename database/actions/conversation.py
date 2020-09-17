@@ -6,8 +6,7 @@ def get_user_conversations(user_id: int, range_from: int, range_to: int, desc: b
     # TODO: Refactor SQL statement to not yield unused values
     conversations_db = _db.get_cursor() \
         .execute('SELECT id, receiver, sender, date_sent FROM messages WHERE sender = ? or receiver = ? '
-                 'ORDER BY date_sent ' + ('desc ' if desc else '') + f'LIMIT {range_to - range_from} ' +
-                 f'OFFSET {range_from}', (user_id, user_id))
+                 'ORDER BY date_sent ' + ('desc ' if desc else ''), (user_id, user_id))
 
     already_used = list()
     tmp = list()

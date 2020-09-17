@@ -9,8 +9,6 @@ def encode_if_id(key: str, value, encode: list = None):
     if encode is None:
         encode = ['id']
 
-    print(value, key)
-
     return value if key not in encode else number_encode.b64encode_pad(value, 11)
 
 
@@ -23,7 +21,7 @@ def _raise_token_error():
                 'password': '[user_password]'
             }
         }
-    }, {'WWW-Authenticate': 'Bearer realm="basic user data"'})
+    }, {'WWW-Authenticate': 'Bearer realm="basic user data"'}, cors=True)
 
 
 def handle_bearer_token(request: Request, db):

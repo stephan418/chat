@@ -4,7 +4,7 @@ CREATE TABLE users
     name          TEXT    NOT NULL,
     password_hash TEXT    NOT NULL,
     login_id      TEXT CHECK (login_id NOT NULL OR email NOT NULL),
-    email         TEXT DEFAULT NULL,
+    email         TEXT    DEFAULT NULL,
     creation      INTEGER NOT NULL,
     last_login    INTEGER DEFAULT NULL,
     last_write    INTEGER NOT NULL
@@ -57,13 +57,21 @@ CREATE TABLE blobs
 
 CREATE TABLE sessions
 (
-    id           INTEGER PRIMARY KEY,
-    secret       TEXT    NOT NULL,
-    request_ip   TEXT    NOT NULL,
-    for_user     INTEGER NOT NULL,
-    creation     INTEGER NOT NULL,
-    expires      INTEGER NOT NULL,
+    id            INTEGER PRIMARY KEY,
+    secret        TEXT    NOT NULL,
+    request_ip    TEXT    NOT NULL,
+    for_user      INTEGER NOT NULL,
+    creation      INTEGER NOT NULL,
+    expires       INTEGER NOT NULL,
     times_renewed INTEGER NOT NULL,
 
     FOREIGN KEY (for_user) REFERENCES users (id)
 );
+
+CREATE TABLE active_users
+(
+    user_id      INTEGER PRIMARY KEY,
+    active_since INTEGER,
+
+    FOREIGN KEY (user_id) REFERENCES users (id)
+)

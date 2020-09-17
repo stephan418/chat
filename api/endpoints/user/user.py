@@ -5,22 +5,41 @@
 from api.paginate import paginate
 from flask import Blueprint, request, jsonify
 from api.HTTPErrors import APIError
-from database.actions.user import get_all_users, create_user, get_user
+from database.actions.user import get_all_users, create_user, get_user, get_by_login_id
+from database.actions.message import get_user_messages
 from database.db import MDB
 from api import common
+from api.endpoints.message import common as message_common
+from api.cors import CORS
 from security.encode import number_encode
+from security.logging.logger import Logger
+from security.configuration.config import Config
+from functools import wraps
+
+c = Config("config.json")
+logger = Logger(c)
 
 user_endpoint = Blueprint("User endpoint", __name__)
+cors = CORS(user_endpoint)
+
+
+def use_logger(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        logger.log(f"{request.method} {request.path} from {request.remote_addr}")
+        return func(*args, **kwargs)
+
+    return inner
 
 
 # URL-scheme: /user?per_page=a&page=b&order_by=c&descending=d with a < 50 and b + 1 in pages
 # and c is one of 'name', 'id', 'creation' and d is True or False
-@user_endpoint.route('/', methods=['GET'])
+@user_endpoint.route('/', methods=['GET'], provide_automatic_options=False)
+@cors.append('/', ['GET'])
+@use_logger
 def get_user_root():
     # Create db connection (Thread) TODO: Investigate
     db = MDB('test.db')
-
-    print(request.content_type)
 
     per_page, page, order_by, desc = paginate(request.args, per_page=10, page=0, order_by='name', descending="False")
     if per_page > 50:
@@ -63,6 +82,8 @@ def get_user_root():
 
 
 @user_endpoint.route('/', methods=['POST'])
+@cors.append('/', ['POST'])
+@use_logger
 def post_user_root():
     db = MDB('test.db')
 
@@ -84,7 +105,21 @@ def post_user_root():
     return jsonify({k: common.encode_if_id(k, user.get_item(k)) for k in keys})
 
 
+@user_endpoint.route('/lid:<login_id>')
+@cors.append('/', ['GET'])
+def get_bla(login_id):
+    db = MDB('test.db')
+    lid = get_by_login_id(login_id, db)
+
+    if not lid:
+        raise APIError('The requested resource could not be found', 'NOT_FOUND', 404)
+
+    return jsonify({'id': number_encode.b64encode_pad(lid, 11)})
+
+
 @user_endpoint.route('/<string:user_id>', methods=['GET'])
+@cors.append('/', ['GET'])
+@use_logger
 def get_user_id(user_id):
     db = MDB('test.db')
 
@@ -95,7 +130,7 @@ def get_user_id(user_id):
     user = get_user(uid, db)
 
     if user is None:
-        raise APIError('The requested resource could not be found', 'NOT_FOUND', 404)
+        raise APIError('The requested resource could not be found', 'NOT_FOUND', 404, cors={'methods': 'GET'})
 
     keys = list(user.__dict__.keys())
 
@@ -104,3 +139,13 @@ def get_user_id(user_id):
         keys.remove(key)
 
     return jsonify({k: common.encode_if_id(k, user.get_item(k)) for k in keys})
+
+
+# This route has to handle authentication, as it access information based on the accessing user
+@user_endpoint.route('/<string:user_id>/message/', methods=['GET'], provide_automatic_options=False)
+@cors.append('/<string:user_id>/message/', ['GET'], authentication=True)
+def get_user_id_messages(user_id):
+    db = MDB('test.db')
+
+    return message_common.api_get_messages(request, user_id, db)
+

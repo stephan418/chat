@@ -5,11 +5,14 @@ from api.paginate import paginate
 from database.db import MDB
 from database.actions.conversation import get_user_conversations
 from security.encode.number_encode import b64encode_pad
+from api.cors import CORS
 
 conversation_endpoint = Blueprint('Conversation Blueprint', __name__, url_prefix='/conversation')
+cors = CORS(conversation_endpoint)
 
 
 @conversation_endpoint.route('/', methods=['GET'])
+@cors.append('/', ['GET'], authentication=True)
 def get_conversation_root():
     db = MDB('test.db')
 
@@ -26,7 +29,7 @@ def get_conversation_root():
     conversations = get_user_conversations(s.for_user, per_page * page, (page + 1) * per_page, _db=db)
 
     if len(conversations) <= 0:
-        raise APIError('page out of range', 'PAGE_OUT_OF_RANGE', 404)
+        raise APIError('page out of range', 'PAGE_OUT_OF_RANGE', 404, cors=True)
 
     result = list()
     for conversation in conversations:
@@ -39,3 +42,4 @@ def get_conversation_root():
         })
 
     return jsonify(result)
+

@@ -73,13 +73,15 @@ def get_message(msg_id: int, _db=db):
 
 
 def get_user_messages(user_id: int, range_from: int, range_to: int, order_by: str = 'date_sent', desc: bool = False,
-                      _db=db):
+                      with_user: int = None, _db=db):
     """ Get all the messages sent or received by a specific user """
     messages_db = _db.get_cursor()\
-        .execute('SELECT id, sender, receiver, creation, date_sent, text_content, additional_content, '
-                 'date_delivered, date_read, last_write FROM messages WHERE receiver = ? OR sender = ? '
-                 f'ORDER BY {order_by} ' + ('desc ' if desc else '') + f'LIMIT {range_to - range_from} OFFSET {range_from}',
-                 (user_id, user_id))
+        .execute('SELECT id, sender, receiver, creation, date_sent, text_content, additional_content  '
+                 'date_delivered, date_read, last_write FROM messages WHERE ' +
+                 (f'(receiver = ? AND sender = ?) OR (receiver = ? AND sender = ?) ' if with_user else 'receiver = ? OR sender = ? ') +
+                 f'ORDER BY {order_by} ' + (
+                     'desc ' if desc else '') + f'LIMIT {range_to - range_from} OFFSET {range_from}',
+                 (user_id, user_id) if not with_user else (user_id, with_user, with_user, user_id))
 
     messages = []
     for msg in messages_db:

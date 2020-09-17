@@ -6,10 +6,13 @@ from database.objects.message import Content
 from api.HTTPErrors import APIError
 from api.paginate import paginate
 from api import common
+from api.endpoints.message import common as message_common
 from security.encode.number_encode import b64decode
 import time
+from api.cors import CORS
 
 message_endpoint = Blueprint('Message endpoint', __name__, url_prefix='/message')
+cors = CORS(message_endpoint)
 
 
 # Gets all messages the user is authorized to see
@@ -17,45 +20,12 @@ message_endpoint = Blueprint('Message endpoint', __name__, url_prefix='/message'
 # WWW-Authenticate: Bearer realm='user-related'
 # URL-scheme: /message?per_page=a&page=b&order_by=c&descending=d with a < 50 and b + 1 in pages
 # and c is one of 'date_sent', 'date_delivered', 'date_read', 'id', 'receiver', 'sender' and d is True or False
-@message_endpoint.route('/', methods=['GET'])
+@message_endpoint.route('/', methods=['GET'], provide_automatic_options=False)
+@cors.append('/', ['GET'], authentication=True)
 def get_message_root():
     db = MDB('test.db')
 
-    s = common.handle_bearer_token(request, db)
-
-    per_page, page, order_by, desc = paginate(request.args, per_page=10, page=0, order_by='date_sent',
-                                              descending="False")
-    if per_page > 50:
-        raise APIError('per_page must not be greater than 50', 'INVALID_PAGINATION', 400)
-
-    if order_by not in ['date_sent', 'date_delivered', 'date_read', 'id', 'receiver', 'sender']:
-        raise APIError('order_by must be either date_sent, date_delivered, date_read, id, receiver or sender',
-                       'INVALID_VALUE', 400)
-
-    if desc.casefold() == 'true':
-        desc = True
-    elif desc.casefold() == 'false':
-        desc = False
-    else:
-        raise APIError('descending must be either true or false', 'INVALID_VALUE', 400)
-
-    if page < 0 or per_page <= 0:
-        raise APIError('page must be larger than per_page larger or equal to 1', 'INVALID_PAGINATION', 400)
-
-    messages = get_user_messages(s.for_user, per_page * page, (page + 1) * per_page, order_by, desc, _db=db)
-
-    if len(messages) <= 0:
-        raise APIError('page out of range', 'PAGE_OUT_OF_RANGE', 404, payload={
-            "items": db.get_number_of_items_in_table('messages')
-        })
-
-    keys = list(messages[0].__dict__.keys())
-
-    result = list()
-    for msg in messages:
-        result.append({k: common.encode_if_id(k, msg.get_item(k), ['id', 'sender', 'receiver']) for k in keys})
-
-    return jsonify(result)
+    return message_common.api_get_messages(request, _db=db)
 
 
 @message_endpoint.route('/<string:message_id>', methods=['GET'])
@@ -80,6 +50,7 @@ def get_message_id(message_id):
 
 
 @message_endpoint.route('/', methods=['POST'])
+@cors.append('/', ['POST'], authentication=True)
 def post_message_root():
     db = MDB('test.db')
 

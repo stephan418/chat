@@ -30,6 +30,17 @@ class Config:
 
         return self._config[key]
 
+    def get(self, key, default):
+        result = default
+
+        try:
+            result = self.__getitem__(key)
+        except KeyError:
+            pass
+
+        return result
+
+
     def apply_to_app(self, app: Flask):
         """ Applies all config keys matching flask.* to the Flask app """
         for item in filter(lambda x: x[0].startswith('flask.'), self._config.items()):
